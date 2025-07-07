@@ -9,11 +9,8 @@ venv/
 # Jupyter Notebook checkpoints (ignore if you add notebooks later)
 .ipynb_checkpoints
 
-# Data files (raw big data)
+# Data files (big data)
 data/raw/
-
-# Uncomment if you want to ignore processed data too (small samples)
-# data/processed/
 
 # MacOS system files
 .DS_Store
