@@ -3,31 +3,64 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import os
 
-def download_bts_data():
-    driver = webdriver.Safari()
+driver = webdriver.Safari()
+driver.get("https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoyr_VQ=FGK&QO_fu146_anzr=b0-gvzr")
 
+wait = WebDriverWait(driver, 20)
+
+columns_to_select = [
+    "FL_DATE",
+    "OP_UNIQUE_CARRIER",
+    "ORIGIN",
+    "DEST",
+    "CRS_DEP_TIME",
+    "DEP_TIME",
+    "DEP_DELAY",
+    "ARR_DELAY",
+    "CANCELLED"
+]
+
+for col in columns_to_select:
     try:
-        url = "https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoyr_VQ=FGK&QO_fu146_anzr=b0-gvzr"
-        driver.get(url)
+        checkbox = wait.until(EC.element_to_be_clickable((By.ID, col)))
+        if not checkbox.is_selected():
+            checkbox.click()
+            print(f"Selected {col}")
+    except Exception as e:
+        print(f"Failed to select {col}: {e}")
 
-        wait = WebDriverWait(driver, 20)
+# Wait for the submit/download button to be clickable
+submit_button = wait.until(
+    EC.element_to_be_clickable((By.ID, "btnDownload"))
+)
 
-        # Wait for the submit/download button to be clickable
-        submit_button = wait.until(
-            EC.element_to_be_clickable((By.ID, "btnDownload"))
-        )
+# Click the submit/download button
+submit_button.click()
+time.sleep(30)
 
-        # Click the submit/download button
-        submit_button.click()
+def wait_for_download(download_dir, timeout=60):
+    import time
+    start = time.time()
+    while True:
+        files = [f for f in os.listdir(download_dir) if f.endswith(".zip") or f.endswith(".csv")]
+        if files:
+            print(f"Download detected: {files}")
+            return files[0]
+        elif time.time() - start > timeout:
+            print("Download timeout.")
+            return None
+        time.sleep(1)
 
-        print("Clicked download button, waiting for file to download...")
+download_folder = os.path.expanduser("~/Downloads")
+filename = wait_for_download(download_folder, timeout=60)
+if filename:
+    print(f"Download complete: {filename}")
+else:
+    print("Download not detected within timeout.")
 
-        # Wait some seconds to allow download (adjust if needed)
-        time.sleep(30)
 
-    finally:
-        driver.quit()
+print("Clicked download button, waiting for file to download...")
 
-if __name__ == "__main__":
-    download_bts_data()
+driver.quit()
