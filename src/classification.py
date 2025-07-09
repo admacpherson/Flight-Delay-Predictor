@@ -26,6 +26,13 @@ X["FL_DATE"] = pd.to_datetime(X["FL_DATE"])
 X["DAY_OF_WEEK"] = X["FL_DATE"].dt.dayofweek
 X.drop("FL_DATE", axis=1, inplace=True)
 
+# Convert HHMM to minutes since midnight
+X["DEP_HOUR"] = X["CRS_DEP_TIME"] // 100
+X["DEP_MINUTE"] = X["CRS_DEP_TIME"] % 100
+X["DEP_TIME_SIN"] = np.sin(2 * np.pi * (X["DEP_HOUR"]*60 + X["DEP_MINUTE"]) / (24*60))
+X["DEP_TIME_COS"] = np.cos(2 * np.pi * (X["DEP_HOUR"]*60 + X["DEP_MINUTE"]) / (24*60))
+X.drop("CRS_DEP_TIME", axis=1, inplace=True)
+
 numeric_features = ["CRS_DEP_TIME", "DAY_OF_WEEK"]
 categorical_features = ["OP_UNIQUE_CARRIER", "ORIGIN", "DEST"]
 
