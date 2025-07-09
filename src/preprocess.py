@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import numpy as np
 
 RAW_DIR = "data/raw"
 PROCESSED_DIR = "data/processed"
@@ -22,7 +23,7 @@ def preprocess_file(filename):
     # Keep only selected columns
     df = df[COLUMNS_TO_KEEP]
 
-    # Drop rows where flight was canceled
+    # Drop canceled flights
     df = df[df["CANCELLED"] == 0]
 
     # Drop rows with missing delay info
@@ -31,10 +32,21 @@ def preprocess_file(filename):
     # Convert date column to datetime
     df["FL_DATE"] = pd.to_datetime(df["FL_DATE"])
 
-    # Keep only positive and small negative delays (optional)
+    # Limit delays to a reasonable range
     df = df[(df["DEP_DELAY"] > -60) & (df["DEP_DELAY"] < 360)]
 
-    # Save cleaned version
+    # Feature engineering: day of week, dep time sin/cos, target label
+    df["DAY_OF_WEEK"] = df["FL_DATE"].dt.dayofweek
+    df["DEP_HOUR"] = df["CRS_DEP_TIME"] // 100
+    df["DEP_MINUTE"] = df["CRS_DEP_TIME"] % 100
+    df["DEP_TIME_SIN"] = np.sin(2 * np.pi * (df["DEP_HOUR"] * 60 + df["DEP_MINUTE"]) / (24 * 60))
+    df["DEP_TIME_COS"] = np.cos(2 * np.pi * (df["DEP_HOUR"] * 60 + df["DEP_MINUTE"]) / (24 * 60))
+
+    # Binary target: arrival delay > 15 mins
+    df["ARR_DEL15"] = (df["ARR_DELAY"] > 15).astype(int)
+
+    # Save cleaned and engineered dataset
+    os.makedirs(PROCESSED_DIR, exist_ok=True)
     output_file = os.path.join(PROCESSED_DIR, f"cleaned_{filename}")
     df.to_csv(output_file, index=False)
     print(f"Saved cleaned file: {output_file}")
