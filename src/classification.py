@@ -18,24 +18,10 @@ import io
 from PIL import Image
 import torchvision.transforms as transforms
 
-# -------- Data Loading and Preprocessing --------
+# -------- Data Loading and Setup --------
 
 # Load preprocessed data
 df = pd.read_csv("data/processed/cleaned_T_ONTIME_MARKETING.csv")
-# Remove cancelled flights
-df = df[df["CANCELLED"] == 0]
-# Create binary target for delays: 1 if delay is > 15 min, otherwise 0
-df["ARR_DEL15"] = (df["ARR_DELAY"] > 15).astype(int)
-
-# Feature engineering - convert column to dtype
-df["FL_DATE"] = pd.to_datetime(df["FL_DATE"])
-df["DAY_OF_WEEK"] = df["FL_DATE"].dt.dayofweek
-
-# Convert CRS_DEP_TIME (HHMM) to cyclical features
-df["DEP_HOUR"] = df["CRS_DEP_TIME"] // 100
-df["DEP_MINUTE"] = df["CRS_DEP_TIME"] % 100
-df["DEP_TIME_SIN"] = np.sin(2 * np.pi * (df["DEP_HOUR"]*60 + df["DEP_MINUTE"]) / (24*60))
-df["DEP_TIME_COS"] = np.cos(2 * np.pi * (df["DEP_HOUR"]*60 + df["DEP_MINUTE"]) / (24*60))
 
 # Specify numeric and categorical features
 numeric_features = ["DEP_TIME_SIN", "DEP_TIME_COS", "DAY_OF_WEEK"]
