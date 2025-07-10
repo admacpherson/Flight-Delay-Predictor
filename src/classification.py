@@ -13,6 +13,11 @@ import datetime
 import joblib
 import os
 
+import seaborn as sns
+import io
+from PIL import Image
+import torchvision.transforms as transforms
+
 # Load preprocessed data
 df = pd.read_csv("data/processed/cleaned_T_ONTIME_MARKETING.csv")
 df = df[df["CANCELLED"] == 0]
@@ -206,7 +211,18 @@ log_dir = f"runs/flight_delay_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 os.makedirs(log_dir, exist_ok=True)
 writer = SummaryWriter(log_dir=log_dir)
 
-epochs = 50
+def plot_confusion_matrix(cm):
+    fig, ax = plt.subplots(figsize=(5, 5))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax)
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("Actual")
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    image = Image.open(buf)
+    return transforms.ToTensor()(image)
+
+epochs = 25
 early_stopper = EarlyStopping(patience=5)
 
 best_model_state = None
@@ -270,3 +286,9 @@ metrics_dict = {
 }
 
 update_readme_with_metrics(metrics_dict)
+
+conf_tensor = plot_confusion_matrix(conf_matrix)
+writer.add_image("ConfusionMatrix", conf_tensor)
+writer.add_scalar("Test/Accuracy", report["accuracy"])
+writer.add_scalar("Test/ROC_AUC", roc_auc)
+writer.close()
