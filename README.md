@@ -89,7 +89,7 @@ Class imbalance is addressed using weighted loss functions or resampling techniq
 |------|----------|----------------|------------|--------|----------------|------------|--------|---------|
 | 2025-07-10 | 0.20 | 0.94 | 0.02 | 0.04 | 0.18 | 0.99 | 0.31 | 0.664 |
 
-### Confusion Matrix
+### Confusion Matrix *(Auto Generated)*
 
 
 ## 🚀 Future Enhancements
