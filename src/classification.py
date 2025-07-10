@@ -10,6 +10,8 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import datetime
+import joblib
+import os
 
 # Load preprocessed data
 df = pd.read_csv("data/processed/cleaned_T_ONTIME_MARKETING.csv")
@@ -120,7 +122,7 @@ criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
 # Learning rate scheduler
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=3, verbose=True)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=3)
 
 # Training and evaluation functions
 def train(model, dataloader, criterion, optimizer, device):
@@ -149,6 +151,35 @@ def evaluate(model, dataloader, device):
             all_targets.append(y_batch.numpy())
     return np.vstack(all_preds), np.vstack(all_targets)
 
+# Update README with performance metrics
+def update_readme_with_metrics(metrics):
+    readme_path = "README.md"
+    today = datetime.date.today().isoformat()
+
+    header = (
+        "## Model Performance\n\n"
+        "| Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |\n"
+        "|------|----------|----------------|------------|--------|----------------|------------|--------|---------|\n"
+    )
+
+    new_row = f"| {today} | {metrics['accuracy']:.2f} | {metrics['precision_0']:.2f} | {metrics['recall_0']:.2f} | {metrics['f1_0']:.2f} | {metrics['precision_1']:.2f} | {metrics['recall_1']:.2f} | {metrics['f1_1']:.2f} | {metrics['roc_auc']:.3f} |\n"
+
+    with open(readme_path, "r") as f:
+        lines = f.readlines()
+
+    # Find start of model performance section (if any)
+    start_idx = next((i for i, line in enumerate(lines) if line.strip() == "## Model Performance"), None)
+
+    if start_idx is not None:
+        # Remove everything from the section onward
+        lines = lines[:start_idx]
+
+    # Add new section with updated content
+    with open(readme_path, "w") as f:
+        f.writelines(lines)
+        f.write("\n" + header + new_row)
+
+
 # Early stopping
 class EarlyStopping:
     def __init__(self, patience=5, delta=0.001):
@@ -172,6 +203,7 @@ class EarlyStopping:
 
 # TensorBoard writer
 log_dir = f"runs/flight_delay_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+os.makedirs(log_dir, exist_ok=True)
 writer = SummaryWriter(log_dir=log_dir)
 
 epochs = 50
@@ -202,18 +234,39 @@ for epoch in range(epochs):
 # Load best model weights
 model.load_state_dict(best_model_state)
 
-# Test evaluation
+# Final test evaluation
 y_proba, y_true = evaluate(model, test_loader, device)
+y_true = y_true.ravel()
+y_proba = y_proba.ravel()
 y_pred = (y_proba >= 0.5).astype(int)
 
-print(confusion_matrix(y_true, y_pred))
-print(classification_report(y_true, y_pred))
-print("Test ROC AUC:", roc_auc_score(y_true, y_proba))
+report_raw = classification_report(y_true, y_pred, output_dict=True, labels=[0, 1])
+report = {str(k): v for k, v in report_raw.items()}
 
-# Save model, scaler, label encoders
+conf_matrix = confusion_matrix(y_true, y_pred)
+roc_auc = roc_auc_score(y_true, y_proba)
+
+# Print results
+print(conf_matrix)
+print(classification_report(y_true, y_pred))
+print("Test ROC AUC:", roc_auc)
+
+# Save model and scalers
 torch.save(model.state_dict(), "models/pytorch_flight_delay_embeddings.pth")
-import joblib
 joblib.dump(scaler, "models/scaler.joblib")
 joblib.dump(label_encoders, "models/label_encoders.joblib")
-
 print("Saved model and preprocessors.")
+
+# Update README
+metrics_dict = {
+    "accuracy": report["accuracy"],
+    "precision_0": report["0"]["precision"],
+    "recall_0": report["0"]["recall"],
+    "f1_0": report["0"]["f1-score"],
+    "precision_1": report["1"]["precision"],
+    "recall_1": report["1"]["recall"],
+    "f1_1": report["1"]["f1-score"],
+    "roc_auc": roc_auc,
+}
+
+update_readme_with_metrics(metrics_dict)
