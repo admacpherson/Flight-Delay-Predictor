@@ -2,14 +2,6 @@
 
 A neural network model built with PyTorch to predict flight delays using historical U.S. airline performance data. The model classifies whether a flight will be delayed at departure based on key operational features.
 
-<<<<<<< HEAD
-
-## Model Performance
-
-| Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |
-|------|----------|----------------|------------|--------|----------------|------------|--------|---------|
-| 2025-07-10 | 0.20 | 0.94 | 0.02 | 0.04 | 0.18 | 0.99 | 0.31 | 0.664 |
-=======
 ## 📊 Overview
 
 Delays in commercial aviation have wide-reaching impacts. This project uses supervised learning on real-world flight data to predict delays before they happen. The model is trained on cleaned data from the U.S. Department of Transportation, using PyTorch for model definition and training and TensorBoard for logging.
@@ -91,18 +83,14 @@ The model is evaluated using:
 
 Class imbalance is addressed using weighted loss functions or resampling techniques.
 
-### Results *(Auto Generated)*
+###  Performance Metrics *(Auto Generated)*
 
 | Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |
 |------|----------|----------------|------------|--------|----------------|------------|--------|---------|
 | 2025-07-10 | 0.20 | 0.94 | 0.02 | 0.04 | 0.18 | 0.99 | 0.31 | 0.664 |
 
-Confusion matrix:
+### Confusion Matrix
 
-```text
-[[ TN  FP ]
- [ FN  TP ]]
-```
 
 ## 🚀 Future Enhancements
 
@@ -112,4 +100,3 @@ Confusion matrix:
 
 **Data Source:**
 [U.S. DOT Bureau of Transportation Statistics](https://www.transtats.bts.gov/)
->>>>>>> 0fd5a38def1a5bf4884d83d774861fc4ad855a8c
