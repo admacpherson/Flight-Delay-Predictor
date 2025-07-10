@@ -18,7 +18,7 @@ COLUMNS_TO_KEEP = [
 ]
 
 def preprocess_file(filename):
-    print(f"Preprocessing {filename}")
+    print(f"Preprocessing {filename}...")
     df = pd.read_csv(os.path.join(RAW_DIR, filename))
 
     # Keep only selected columns
@@ -31,7 +31,7 @@ def preprocess_file(filename):
     df = df.dropna(subset=["DEP_DELAY", "ARR_DELAY"])
 
     # Convert date column to datetime
-    df["FL_DATE"] = pd.to_datetime(df["FL_DATE"], format="%Y-%m-%d", errors="coerce")
+    df["FL_DATE"] = pd.to_datetime(df["FL_DATE"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
 
     # Limit delays to a reasonable range
     df = df[(df["DEP_DELAY"] > -60) & (df["DEP_DELAY"] < 360)]
