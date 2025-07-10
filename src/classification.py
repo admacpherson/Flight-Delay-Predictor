@@ -190,7 +190,7 @@ def update_readme_with_metrics(metrics):
 
     # Set up table
     header = (
-        "## Model Performance\n\n"
+        "## Model Performance\n\n <i>(Automatically updated during run)<i>"
         "| Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |\n"
         "|------|----------|----------------|------------|--------|----------------|------------|--------|---------|\n"
     )
@@ -202,7 +202,7 @@ def update_readme_with_metrics(metrics):
     with open(readme_path, "r") as f:
         lines = f.readlines()
     # Find start of model performance section (if already present)
-    start_idx = next((i for i, line in enumerate(lines) if line.strip() == "## Model Performance"), None)
+    start_idx = next((i for i, line in enumerate(lines) if line.strip() == "# Results (Auto Generated)"), None)
 
     # Clear previous entries
     if start_idx is not None:
@@ -301,8 +301,8 @@ y_proba, y_true = evaluate(model, test_loader, device)
 y_true = y_true.ravel()
 y_proba = y_proba.ravel()
 
-# Apply 0.5 threshold to probabilities for predicted classes
-y_pred = (y_proba >= 0.5).astype(int)
+# Apply threshold to probabilities for predicted classes
+y_pred = (y_proba >= 0.2).astype(int)
 
 # Generate classification report dictionary with precision, recall, f1, etc.
 report_raw = classification_report(y_true, y_pred, output_dict=True, labels=[0, 1])
