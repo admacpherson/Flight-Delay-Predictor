@@ -190,7 +190,7 @@ def update_readme_with_metrics(metrics):
 
     # Set up table
     header = (
-        "## Model Performance\n\n <i>(Automatically updated during run)<i>"
+        "### Performance Metrics *(Auto Generated)*"
         "| Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |\n"
         "|------|----------|----------------|------------|--------|----------------|------------|--------|---------|\n"
     )
@@ -198,11 +198,17 @@ def update_readme_with_metrics(metrics):
     # Create new row with metrics
     new_row = f"| {today} | {metrics['accuracy']:.2f} | {metrics['precision_0']:.2f} | {metrics['recall_0']:.2f} | {metrics['f1_0']:.2f} | {metrics['precision_1']:.2f} | {metrics['recall_1']:.2f} | {metrics['f1_1']:.2f} | {metrics['roc_auc']:.3f} |\n"
 
+    # Format confusion matrix as markdown code block
+    conf_matrix_str = "\n".join(
+        [" ".join([f"{val:>7}" for val in row]) for row in conf_matrix]
+    )
+    conf_matrix_block = f"\n### Confusion Matrix *(Auto Generated)*\n\n```\n{conf_matrix_str}\n```\n"
+
     # Iterate through the existing README
     with open(readme_path, "r") as f:
         lines = f.readlines()
     # Find start of model performance section (if already present)
-    start_idx = next((i for i, line in enumerate(lines) if line.strip() == "# Results (Auto Generated)"), None)
+    start_idx = next((i for i, line in enumerate(lines) if line.strip() == "# Performance Metrics *(Auto Generated)*"), None)
 
     # Clear previous entries
     if start_idx is not None:
@@ -212,6 +218,7 @@ def update_readme_with_metrics(metrics):
     with open(readme_path, "w") as f:
         f.writelines(lines)
         f.write("\n" + header + new_row)
+        f.write("\n" + conf_matrix_block)
 
 # Early stopping to halt training if validation metric doesn't improve
 class EarlyStopping:

@@ -1,15 +1,12 @@
 # ✈️ PyTorch Flight Delay Predictor
 
 A neural network model built with PyTorch to predict flight delays using historical U.S. airline performance data. The model classifies whether a flight will be delayed at departure based on key operational features.
-
-<<<<<<< HEAD
-
 ## Model Performance
 
 | Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |
 |------|----------|----------------|------------|--------|----------------|------------|--------|---------|
 | 2025-07-10 | 0.20 | 0.94 | 0.02 | 0.04 | 0.18 | 0.99 | 0.31 | 0.664 |
-=======
+
 ## 📊 Overview
 
 Delays in commercial aviation have wide-reaching impacts. This project uses supervised learning on real-world flight data to predict delays before they happen. The model is trained on cleaned data from the U.S. Department of Transportation, using PyTorch for model definition and training and TensorBoard for logging.
@@ -95,13 +92,14 @@ Class imbalance is addressed using weighted loss functions or resampling techniq
 
 | Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |
 |------|----------|----------------|------------|--------|----------------|------------|--------|---------|
-| 2025-07-10 | 0.20 | 0.94 | 0.02 | 0.04 | 0.18 | 0.99 | 0.31 | 0.664 |
+| 2025-07-10 | 0.20 | 0.95 | 0.03 | 0.05 | 0.18 | 0.99 | 0.31 | 0.670 |
 
-Confusion matrix:
 
-```text
-[[ TN  FP ]
- [ FN  TP ]]
+### Confusion Matrix *(Auto Generated)*
+
+```
+   2377   92178
+    137   20711
 ```
 
 ## 🚀 Future Enhancements
@@ -112,4 +110,3 @@ Confusion matrix:
 
 **Data Source:**
 [U.S. DOT Bureau of Transportation Statistics](https://www.transtats.bts.gov/)
->>>>>>> 0fd5a38def1a5bf4884d83d774861fc4ad855a8c
