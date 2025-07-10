@@ -24,7 +24,7 @@ import torchvision.transforms as transforms
 df = pd.read_csv("data/processed/cleaned_T_ONTIME_MARKETING.csv")
 
 # Specify numeric and categorical features
-numeric_features = ["DEP_TIME_SIN", "DEP_TIME_COS", "DAY_OF_WEEK"]
+numeric_features = ["DEP_TIME_SIN", "DEP_TIME_COS", "DAY_OF_WEEK", "ORIGIN_FLIGHT_COUNT", "IS_HOLIDAY"]
 categorical_features = ["OP_UNIQUE_CARRIER", "ORIGIN", "DEST"]
 
 # Label encode categorical features to integers (for embedding)

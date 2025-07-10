@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
+import holidays
 
 RAW_DIR = "data/raw"
 PROCESSED_DIR = "data/processed"
@@ -30,7 +31,7 @@ def preprocess_file(filename):
     df = df.dropna(subset=["DEP_DELAY", "ARR_DELAY"])
 
     # Convert date column to datetime
-    df["FL_DATE"] = pd.to_datetime(df["FL_DATE"])
+    df["FL_DATE"] = pd.to_datetime(df["FL_DATE"], format="%Y-%m-%d", errors="coerce")
 
     # Limit delays to a reasonable range
     df = df[(df["DEP_DELAY"] > -60) & (df["DEP_DELAY"] < 360)]
@@ -44,6 +45,13 @@ def preprocess_file(filename):
 
     # Binary target: arrival delay > 15 mins
     df["ARR_DEL15"] = (df["ARR_DELAY"] > 15).astype(int)
+
+    # Airport congestion proxy
+    df["ORIGIN_FLIGHT_COUNT"] = df.groupby(["FL_DATE", "ORIGIN"])["FL_DATE"].transform("count")
+
+    # Check if holiday
+    us_holidays = holidays.US()
+    df["IS_HOLIDAY"] = df["FL_DATE"].apply(lambda date: int(date in us_holidays))
 
     # Save cleaned and engineered dataset
     os.makedirs(PROCESSED_DIR, exist_ok=True)
