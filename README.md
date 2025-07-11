@@ -105,3 +105,15 @@ Class imbalance is addressed using weighted loss functions or resampling techniq
 
 **Data Source:**
 [U.S. DOT Bureau of Transportation Statistics](https://www.transtats.bts.gov/)
+
+### Performance Metrics *(Auto Generated)*| Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |
+|------|----------|----------------|------------|--------|----------------|------------|--------|---------|
+| 2025-07-11 | 0.82 | 0.82 | 1.00 | 0.90 | 0.00 | 0.00 | 0.00 | 0.661 |
+
+
+### Confusion Matrix *(Auto Generated)*
+
+```
+  94555       0
+  20848       0
+```
