@@ -117,3 +117,15 @@ Class imbalance is addressed using weighted loss functions or resampling techniq
   94555       0
   20848       0
 ```
+
+### Performance Metrics *(Auto Generated)*| Date | Accuracy | Precision (0) | Recall (0) | F1 (0) | Precision (1) | Recall (1) | F1 (1) | ROC AUC |
+|------|----------|----------------|------------|--------|----------------|------------|--------|---------|
+| 2025-07-25 | 0.80 | 0.84 | 0.94 | 0.89 | 0.38 | 0.17 | 0.23 | 0.664 |
+
+
+### Confusion Matrix *(Auto Generated)*
+
+```
+  88940    5615
+  17335    3513
+```

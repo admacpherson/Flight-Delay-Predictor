@@ -321,6 +321,9 @@ for t in thresholds:
 
 print(f"Best threshold: {best_thresh}, F1: {best_f1}")
 
+y_pred = (y_proba >= best_thresh).astype(int)
+
+
 # Generate classification report dictionary with precision, recall, f1, etc.
 report_raw = classification_report(y_true, y_pred, output_dict=True, labels=[0, 1])
 # Convert keys to strings
