@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve
@@ -308,8 +309,17 @@ y_proba, y_true = evaluate(model, test_loader, device)
 y_true = y_true.ravel()
 y_proba = y_proba.ravel()
 
-# Apply threshold to probabilities for predicted classes
-y_pred = (y_proba >= 0.2).astype(int)
+# Apply threshold tuning to validation set
+thresholds = np.arange(0.1, 0.9, 0.05)
+best_thresh, best_f1 = 0.5, 0
+
+for t in thresholds:
+    preds = (val_proba >= t).astype(int)
+    f1 = f1_score(val_true, preds)
+    if f1 > best_f1:
+        best_f1, best_thresh = f1, t
+
+print(f"Best threshold: {best_thresh}, F1: {best_f1}")
 
 # Generate classification report dictionary with precision, recall, f1, etc.
 report_raw = classification_report(y_true, y_pred, output_dict=True, labels=[0, 1])
