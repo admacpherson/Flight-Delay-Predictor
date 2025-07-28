@@ -209,7 +209,7 @@ def update_readme_with_metrics(metrics):
     with open(readme_path, "r") as f:
         lines = f.readlines()
     # Find start of model performance section (if already present)
-    start_idx = next((i for i, line in enumerate(lines) if line.strip() == "# Performance Metrics *(Auto Generated)*"), None)
+    start_idx = next((i for i, line in enumerate(lines) if line.strip() == "### Performance Metrics *(Auto Generated)*\n") + 1, None)
 
     # Clear previous entries
     if start_idx is not None:
