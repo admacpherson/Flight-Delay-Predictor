@@ -52,19 +52,23 @@ X_num_train, X_num_val, X_cat_train, X_cat_val, y_train, y_val = train_test_spli
     X_num_temp, X_cat_temp, y_temp, test_size=0.25, random_state=42
 )
 
+
 # -------- PyTorch Dataset --------
 
 # Define PyTorch dataset with embeddings
 class FlightDelayDataset(Dataset):
     def __init__(self, X_num, X_cat, y):
-    # Convert numpy arrays to torch tensors
+        # Convert numpy arrays to torch tensors
         self.X_num = torch.tensor(X_num, dtype=torch.float32)
         self.X_cat = torch.tensor(X_cat, dtype=torch.long)
         self.y = torch.tensor(y, dtype=torch.float32).unsqueeze(1)
+
     def __len__(self):
         return len(self.y)
+
     def __getitem__(self, idx):
         return self.X_num[idx], self.X_cat[idx], self.y[idx]
+
 
 # Create train/test/val datasets
 train_dataset = FlightDelayDataset(X_num_train, X_cat_train, y_train)
@@ -75,6 +79,7 @@ test_dataset = FlightDelayDataset(X_num_test, X_cat_test, y_test)
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=64)
 test_loader = DataLoader(test_dataset, batch_size=64)
+
 
 # -------- Model Definition --------
 
@@ -103,7 +108,7 @@ class FlightDelayNNEmbeddings(nn.Module):
             nn.BatchNorm1d(32),
             nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(32, 1) # Single output for binary classification (logit)
+            nn.Linear(32, 1)    # Single output for binary classification (logit)
         )
 
     # Forward pass
@@ -115,12 +120,14 @@ class FlightDelayNNEmbeddings(nn.Module):
         # Forward pass through fully connected layers
         return self.fc(x)
 
+
 # Determine number of categories for each categorical feature (for embeddings)
 cat_cardinalities = [len(label_encoders[col].classes_) for col in categorical_features]
 # Heuristic for embedding dimension size (up to 50, or half the category size)
 embedding_dims = [min(50, (card + 1) // 2) for card in cat_cardinalities]
 # Number of numeric features (input size)
 input_num_feats = X_num_train.shape[1]
+
 
 # -------- Training and Evaluation --------
 
@@ -132,6 +139,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Move model to the device
 model.to(device)
 
+
 # Compute positive class weight to handle class imbalance in loss function
 pos_weight = torch.tensor([(y_train == 1).sum() / (y_train == 0).sum()], dtype=torch.float32).to(device)
 # Use binary cross entropy with logits loss (more stable than sigmoid + BCE)
@@ -141,6 +149,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
 # Learning rate scheduler that reduces LR on plateau of validation AUC
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=3)
+
 
 # Training loop for each epoch
 def train(model, dataloader, criterion, optimizer, device):
@@ -165,13 +174,14 @@ def train(model, dataloader, criterion, optimizer, device):
     # Return average loss
     return total_loss / len(dataloader.dataset)
 
+
 # Evaluation function for model predictions and true labels
 def evaluate(model, dataloader, device):
     # Set model to evaluation mode
     model.eval()
     all_preds = []
     all_targets = []
-    with torch.no_grad(): # Disable gradient calculation
+    with torch.no_grad():   # Disable gradient calculation
         for X_num_batch, X_cat_batch, y_batch in dataloader:
             X_num_batch, X_cat_batch = X_num_batch.to(device), X_cat_batch.to(device)
             outputs = model(X_num_batch, X_cat_batch)
@@ -181,6 +191,7 @@ def evaluate(model, dataloader, device):
             all_targets.append(y_batch.numpy())
     # Stack all batch predictions and targets vertically
     return np.vstack(all_preds), np.vstack(all_targets)
+
 
 # -------- Helper functions --------
 
@@ -209,7 +220,9 @@ def update_readme_with_metrics(metrics):
     with open(readme_path, "r") as f:
         lines = f.readlines()
     # Find start of model performance section (if already present)
-    start_idx = next((i for i, line in enumerate(lines) if line.strip() == "### Performance Metrics *(Auto Generated)*\n") + 1, None)
+    start_idx = next(
+        (i for i, line in enumerate(lines) if line.strip() == "### Performance Metrics *(Auto Generated)*\n") + 1,
+        None)
 
     # Clear previous entries
     if start_idx is not None:
@@ -221,11 +234,12 @@ def update_readme_with_metrics(metrics):
         f.write("\n" + header + new_row)
         f.write("\n" + conf_matrix_block)
 
+
 # Early stopping to halt training if validation metric doesn't improve
 class EarlyStopping:
     def __init__(self, patience=5, delta=0.001):
-        self.patience = patience # How many epochs to wait
-        self.delta = delta # Minimum improvement to reset patience
+        self.patience = patience    # How many epochs to wait
+        self.delta = delta          # Minimum improvement to reset patience
         self.best_score = None
         self.counter = 0
         self.early_stop = False
@@ -242,10 +256,12 @@ class EarlyStopping:
             self.best_score = score
             self.counter = 0
 
+
 # Initialize TensorBoard summary writer with timestamped log directory
 log_dir = f"runs/flight_delay_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
 os.makedirs(log_dir, exist_ok=True)
 writer = SummaryWriter(log_dir=log_dir)
+
 
 # Helper function to create a confusion matrix image for TensorBoard visualization
 def plot_confusion_matrix(cm):
@@ -260,6 +276,7 @@ def plot_confusion_matrix(cm):
     image = Image.open(buf)
     # Convert PIL image to tensor for TensorBoard
     return transforms.ToTensor()(image)
+
 
 # -------- Main training pipeline --------
 
