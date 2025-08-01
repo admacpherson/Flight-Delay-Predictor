@@ -141,7 +141,9 @@ model.to(device)
 
 
 # Compute positive class weight to handle class imbalance in loss function
-pos_weight = torch.tensor([(y_train == 1).sum() / (y_train == 0).sum()], dtype=torch.float32).to(device)
+num_pos = (y_train == 1).sum()
+num_neg = (y_train == 0).sum()
+pos_weight = torch.tensor([num_neg / num_pos], dtype=torch.float32).to(device)
 # Use binary cross entropy with logits loss (more stable than sigmoid + BCE)
 criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 # Adam optimizer with fixed LR
