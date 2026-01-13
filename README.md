@@ -1,12 +1,12 @@
-# ✈️ PyTorch Flight Delay Predictor
+# PyTorch Flight Delay Predictor
 
 A neural network model built with PyTorch to predict flight delays using historical U.S. airline performance data. The model classifies whether a flight will be delayed at departure based on key operational features.
 
-## 📊 Overview
+## Overview
 
 Delays in commercial aviation have wide-reaching impacts. This project uses supervised learning on real-world flight data to predict delays before they happen. The model is trained on cleaned data from the U.S. Department of Transportation, using PyTorch for model definition and training and TensorBoard for logging.
 
-## 🧠 Features Used
+## Features Used
 
 The model uses the following **processed and engineered features** as inputs:
 
@@ -27,11 +27,11 @@ The model uses the following **processed and engineered features** as inputs:
 
 *Note:* Raw columns like `CRS_DEP_TIME`, `FL_DATE`, `OP_UNIQUE_CARRIER`, `ORIGIN`, and `DEST` are transformed and encoded during preprocessing before being fed into the model.
 
-## 🗂️ Project Structure
+## Project Structure
 ```text
 Flight-Delay-Predictor/
 ├── data/
-│   ├── raw/                # Too large for GitHub - download on user machine
+│   ├── raw/                # Too large for GitHub - download on local machine
 │   └── processed/
 │       └── cleaned_T_ONTIME_MARKETING.csv
 ├── preprocessed.py         # Data cleaning and encoding
@@ -46,7 +46,7 @@ Flight-Delay-Predictor/
 └── README.md
 ```
 
-## ⚙️ How to Use
+## How to Use
 
 ### 1. Install Dependencies
 
@@ -72,7 +72,7 @@ python classification.py
 tensorboard --logdir=tensorboard_logs
 ```
 
-## 📈 Model Performance
+## Model Performance
 
 The model is evaluated using:
 
@@ -97,7 +97,7 @@ Class imbalance is addressed using weighted loss functions or resampling techniq
   17335    3513
 ```
 
-## 🚀 Future Enhancements
+## Future Enhancements
 
 * Integrate weather data
 * Add more features
